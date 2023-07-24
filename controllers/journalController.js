@@ -121,7 +121,6 @@ exports.deleteJournal = async (req, res) => {
 
     // Implementation for deleting a journal
     const result = await Journal.deleteJournal(journalId);
-    console.log(result);
     if (result) {
       res.status(200).send({ message: "journal deleted successfully" });
     } else {
