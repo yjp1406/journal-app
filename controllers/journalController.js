@@ -14,8 +14,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const createJournal = async (req, res) => {
-  const { description, tagged_students, attachment_type, published_at } =
-    req.body;
+  const { description, tagged_students, attachment_type, published_at } = req.body;
   const createdBy = req.user.id;
 
   try {
@@ -25,6 +24,9 @@ const createJournal = async (req, res) => {
         .status(403)
         .json({ message: "Forbidden. Only teachers can create journals." });
     }
+
+    // Update tagged_students to have "," at first and last positions
+    let formattedTaggedStudents = "," + tagged_students + ",";
 
     let attachment_data = null;
 
@@ -39,7 +41,7 @@ const createJournal = async (req, res) => {
     // Implementation for creating a journal
     const newJournalEntry = await Journal.createJournal(
       description,
-      tagged_students,
+      formattedTaggedStudents,
       attachment_type,
       attachment_data,
       published_at,
@@ -62,6 +64,7 @@ const createJournal = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 const updateJournal = async (req, res) => {
   const journalId = req.params.id;
@@ -98,13 +101,15 @@ const updateJournal = async (req, res) => {
       }
     }
 
+    let formattedTaggedStudents = "," + tagged_students + ",";
+
     // Check and update the fields that have non-null values in the request body
     const updatedFields = {
       description:
         description !== undefined ? description : originalJournal.description,
       tagged_students:
-        tagged_students !== undefined
-          ? tagged_students
+      formattedTaggedStudents !== undefined
+          ? formattedTaggedStudents
           : originalJournal.tagged_students,
       attachment_type:
         attachment_type !== undefined
