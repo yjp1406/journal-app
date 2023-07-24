@@ -7,8 +7,8 @@ const router = express.Router();
 // Authenticate all requests
 router.use(authenticateToken);
 
-router.post('/create-journal', journalController.createJournal);
-router.put('/update-journal/:id', journalController.updateJournal);
+router.post('/create-journal', journalController.upload.single('attachment'),journalController.createJournal);
+router.put('/update-journal/:id', journalController.upload.single('attachment'), journalController.updateJournal);
 router.delete('/delete-journal/:id', journalController.deleteJournal);
 router.post('/publish/:id', journalController.publishJournal);
 

@@ -117,7 +117,7 @@ class Journal {
   static async getStudentFeed(studentId) {
     try {
       const currentIST = getCurrentIST();
-      const [result] = await db.query(queries.studentFeed, [studentId,currentIST]);
+      const [result] = await db.query(queries.studentFeed, [studentId,studentId,studentId,currentIST]);
       return result;
     } catch (error) {
       throw new Error("Error fetching student feed: " + error.message);
