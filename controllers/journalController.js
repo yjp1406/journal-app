@@ -91,9 +91,7 @@ const updateJournal = async (req, res) => {
           ? attachment_data
           : originalJournal.attachment_data,
           published_at:
-          published_at !== undefined ? publishpublished_atdAt : originalJournal.publishedAt,
-      createdBy:
-        createdBy !== undefined ? createdBy : originalJournal.createdBy,
+          published_at !== undefined ? published_at : originalJournal.published_at,
     };
 
     // Perform the update operation

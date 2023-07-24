@@ -1,7 +1,7 @@
 const queries = {
     createJournal: "INSERT INTO journals (description, tagged_students, attachment_type, attachment_data,published_at, created_by) VALUES (?, ?, ?, ?, ?, ?)",
     findById: "SELECT * FROM journals WHERE id = ?",
-    updateJournal: "UPDATE journals SET description = ?, tagged_students = ?, attachment_type = ?, attachment_data = ?, published_at = ?, created_by = ? WHERE id = ?",
+    updateJournal: "UPDATE journals SET description = ?, tagged_students = ?, attachment_type = ?, attachment_data = ?, published_at = ? WHERE id = ?",
     deleteJournal: "DELETE FROM journals WHERE id = ?",
     publishJournal: "UPDATE journals SET published_at = ? WHERE id = ?",
     teacherFeed: "SELECT * FROM journals WHERE created_by = ? ORDER BY published_at DESC",
