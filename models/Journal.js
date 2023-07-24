@@ -53,7 +53,7 @@ class Journal {
       tagged_students,
       attachment_type,
       attachment_data,
-      publishedAt,
+      published_at,
       createdBy,
     } = updatedFields;
 
@@ -61,7 +61,7 @@ class Journal {
       // Update the journal record in the database
       const result = await db.query(
         queries.updateJournal,
-        [description, JSON.stringify(tagged_students), attachment_type, attachment_data, publishedAt, createdBy, journalId]
+        [description, JSON.stringify(tagged_students), attachment_type, attachment_data, published_at, createdBy, journalId]
       );
 
       // Check if the update was successful

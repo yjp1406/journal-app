@@ -50,7 +50,7 @@ const updateJournal = async (req, res) => {
     tagged_students,
     attachment_type,
     attachment_data,
-    publishedAt,
+    published_at,
   } = req.body;
   const createdBy = req.user.id;
 
@@ -90,8 +90,8 @@ const updateJournal = async (req, res) => {
         attachment_data !== undefined
           ? attachment_data
           : originalJournal.attachment_data,
-      publishedAt:
-        publishedAt !== undefined ? publishedAt : originalJournal.publishedAt,
+          published_at:
+          published_at !== undefined ? publishpublished_atdAt : originalJournal.publishedAt,
       createdBy:
         createdBy !== undefined ? createdBy : originalJournal.createdBy,
     };
