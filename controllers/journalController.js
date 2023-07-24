@@ -1,8 +1,13 @@
 const Journal = require("../models/Journal");
 
-exports.createJournal = async (req, res) => {
-  const { description, tagged_students, attachment_type, attachment_data,published_at } =
-    req.body;
+const createJournal = async (req, res) => {
+  const {
+    description,
+    tagged_students,
+    attachment_type,
+    attachment_data,
+    published_at,
+  } = req.body;
   const createdBy = req.user.id;
 
   try {
@@ -25,19 +30,20 @@ exports.createJournal = async (req, res) => {
 
     // Check if the newJournalEntry is not null (i.e., journal entry created successfully)
     if (newJournalEntry) {
-      res.status(201).json({
+      res.status(200).send({
+        success: true,
         message: "Journal entry created successfully",
         journal: newJournalEntry,
       });
     } else {
-      res.status(500).json({ message: "Failed to create journal entry" });
+      res.status(200).send({success:false, message: "Failed to create journal entry" });
     }
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-exports.updateJournal = async (req, res) => {
+const updateJournal = async (req, res) => {
   const journalId = req.params.id;
   const {
     description,
@@ -92,13 +98,18 @@ exports.updateJournal = async (req, res) => {
 
     // Perform the update operation
     const rows = await Journal.updateJournal(journalId, updatedFields);
-    res.json(rows);
+    if (rows) {
+      res.status(200).send({success: true, message: "journal updated successfully" });
+    } else {
+      res.status(200).send({success: false, message: "journal does not exist" });
+    }
+
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-exports.deleteJournal = async (req, res) => {
+const deleteJournal = async (req, res) => {
   const journalId = req.params.id;
 
   try {
@@ -122,16 +133,16 @@ exports.deleteJournal = async (req, res) => {
     // Implementation for deleting a journal
     const result = await Journal.deleteJournal(journalId);
     if (result) {
-      res.status(200).send({ message: "journal deleted successfully" });
+      res.status(200).send({success: true, message: "journal deleted successfully" });
     } else {
-      res.status(200).send({ message: "journal does not exist" });
+      res.status(200).send({success: false, message: "journal does not exist" });
     }
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-exports.publishJournal = async (req, res) => {
+const publishJournal = async (req, res) => {
   const journalId = req.params.id;
 
   try {
@@ -154,15 +165,19 @@ exports.publishJournal = async (req, res) => {
 
     // Implementation for publishing a journal
     const rows = await Journal.publishJournal(journalId);
-    if (rows) res.status(200).json({ message: "published successfully" });
-    else res.status(200).json({ message: "already published" });
+
+    if (rows)
+      res
+        .status(200)
+        .send({ success: true, message: "published successfully" });
+    else res.status(200).send({ success: false, message: "already published" });
   } catch (err) {
     console.log(err.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-exports.getTeacherFeed = async (req, res) => {
+const getTeacherFeed = async (req, res) => {
   const createdBy = req.user.id;
 
   try {
@@ -175,13 +190,19 @@ exports.getTeacherFeed = async (req, res) => {
 
     // Implementation for getting teacher's journal feed
     const rows = await Journal.getTeacherFeed(createdBy);
-    res.status(200).json(rows);
+    if (rows) {
+      res
+        .status(200)
+        .send({ success: true, message: "This is teacher's feed", data: rows });
+    } else {
+      res.status(200).send({ success: false, message: "No feed" });
+    }
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
-exports.getStudentFeed = async (req, res) => {
+const getStudentFeed = async (req, res) => {
   const studentId = req.user.id;
 
   try {
@@ -194,9 +215,25 @@ exports.getStudentFeed = async (req, res) => {
 
     // Implementation for getting student's journal feed
     const rows = await Journal.getStudentFeed(studentId);
-    res.json(rows);
+
+    if (rows) {
+      res
+        .status(200)
+        .send({ success: true, message: "This is student's feed", data: rows });
+    } else {
+      res.status(200).send({ success: false, message: "No feed" });
+    }
   } catch (err) {
     console.log(err.message);
     res.status(500).json({ message: "Internal server error" });
   }
+};
+
+module.exports = {
+  createJournal,
+  updateJournal,
+  deleteJournal,
+  publishJournal,
+  getTeacherFeed,
+  getStudentFeed,
 };

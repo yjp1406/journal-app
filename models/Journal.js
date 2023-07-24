@@ -1,5 +1,6 @@
 const db = require("../config/db");
 const queries = require("../config/queries");
+const {getCurrentIST} = require("../utils/setTime")
 
 class Journal {
   static async createJournal(
@@ -90,11 +91,14 @@ class Journal {
 
   static async publishJournal(journalId) {
     try {
+      const currentIST = getCurrentIST();
+      console.log(currentIST);  
       // Update the journal's published_at field
-      await db.query(queries.publishJournal, [journalId]);
+      await db.query(queries.publishJournal, [currentIST,journalId]);
   
       // Fetch and return the updated journal record
       const [rows] = await db.query(queries.findById, [journalId]);
+      console.log(rows);
       return rows.length ? rows[0] : null;
     } catch (error) {
       throw new Error('Error publishing journal: ' + error.message);
@@ -113,13 +117,9 @@ class Journal {
 
   static async getStudentFeed(studentId) {
     try {
-      const [result] = await db.query(queries.studentFeed, [studentId]);
-      const rows = result.map((row) => {
-        const newRow = { ...row };
-        delete newRow._buf;
-        return newRow;
-      });
-      return rows;
+      const currentIST = getCurrentIST();
+      const [result] = await db.query(queries.studentFeed, [studentId,currentIST]);
+      return result;
     } catch (error) {
       throw new Error("Error fetching student feed: " + error.message);
     }
