@@ -218,32 +218,6 @@ const getTeacherFeed = async (req, res) => {
   }
 };
 
-// const getStudentFeed = async (req, res) => {
-//   const studentId = req.user.id;
-
-//   try {
-//     // Check if the user is a student
-//     if (req.user.role !== "student") {
-//       return res
-//         .status(403)
-//         .json({ message: "Forbidden. Only students can access student feed." });
-//     }
-
-//     // Implementation for getting student's journal feed
-//     const rows = await Journal.getStudentFeed(studentId);
-
-//     if (rows) {
-//       res
-//         .status(200)
-//         .send({ success: true, message: "This is student's feed", data: rows });
-//     } else {
-//       res.status(200).send({ success: false, message: "No feed" });
-//     }
-//   } catch (err) {
-//     console.log(err.message);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
 
 const getStudentFeed = async (req, res) => {
   const studentId = req.user.id;
