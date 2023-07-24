@@ -1,38 +1,39 @@
 const Journal = require("../models/Journal");
-const fs = require('fs');
-const multer = require('multer');
+const fs = require("fs");
+const multer = require("multer");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/');
+    cb(null, "uploads/");
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
+    cb(null, Date.now() + "-" + file.originalname);
   },
 });
 
 const upload = multer({ storage: storage });
 
 const createJournal = async (req, res) => {
-  const {
-    description,
-    tagged_students,
-    attachment_type,
-    published_at,
-  } = req.body;
+  const { description, tagged_students, attachment_type, published_at } =
+    req.body;
   const createdBy = req.user.id;
 
   try {
     // Check if the user is a teacher
-    if (req.user.role !== 'teacher') {
-      return res.status(403).json({ message: 'Forbidden. Only teachers can create journals.' });
+    if (req.user.role !== "teacher") {
+      return res
+        .status(403)
+        .json({ message: "Forbidden. Only teachers can create journals." });
     }
 
     let attachment_data = null;
 
-    console.log(req.file);
-    if (req.file) {
-      attachment_data = req.file.path;
+    if (attachment_type === "URL") {
+      attachment_data = req.body.attachment_data;
+    } else {
+      if (req.file) {
+        attachment_data = req.file.path;
+      }
     }
 
     // Implementation for creating a journal
@@ -49,11 +50,13 @@ const createJournal = async (req, res) => {
     if (newJournalEntry) {
       res.status(200).send({
         success: true,
-        message: 'Journal entry created successfully',
+        message: "Journal entry created successfully",
         journal: newJournalEntry,
       });
     } else {
-      res.status(200).send({ success: false, message: 'Failed to create journal entry' });
+      res
+        .status(200)
+        .send({ success: false, message: "Failed to create journal entry" });
     }
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -62,35 +65,37 @@ const createJournal = async (req, res) => {
 
 const updateJournal = async (req, res) => {
   const journalId = req.params.id;
-  const {
-    description,
-    tagged_students,
-    attachment_type,
-    published_at,
-  } = req.body;
+  const { description, tagged_students, attachment_type, published_at } =
+    req.body;
 
   try {
     // Check if the user is a teacher
-    if (req.user.role !== 'teacher') {
-      return res.status(403).json({ message: 'Forbidden. Only teachers can update journals.' });
+    if (req.user.role !== "teacher") {
+      return res
+        .status(403)
+        .json({ message: "Forbidden. Only teachers can update journals." });
     }
 
     // Fetch the original journal record from the database
     const originalJournal = await Journal.findById(journalId);
 
     if (req.user.id !== originalJournal.created_by) {
-      return res.status(403).json({ message: 'Unauthorized Teacher' });
+      return res.status(403).json({ message: "Unauthorized Teacher" });
     }
 
     // Check if the journal exists
     if (!originalJournal) {
-      return res.status(404).json({ message: 'Journal not found.' });
+      return res.status(404).json({ message: "Journal not found." });
     }
 
     let attachment_data = null;
 
-    if (req.file) {
-      attachment_data = req.file.path;
+    if (attachment_type === "URL") {
+      attachment_data = req.body.attachment_data;
+    } else {
+      if (req.file) {
+        attachment_data = req.file.path;
+      }
     }
 
     // Check and update the fields that have non-null values in the request body
@@ -110,15 +115,21 @@ const updateJournal = async (req, res) => {
           ? attachment_data
           : originalJournal.attachment_data,
       published_at:
-        published_at !== undefined ? published_at : originalJournal.published_at,
+        published_at !== undefined
+          ? published_at
+          : originalJournal.published_at,
     };
 
     // Perform the update operation
     const rows = await Journal.updateJournal(journalId, updatedFields);
     if (rows) {
-      res.status(200).send({ success: true, message: 'Journal updated successfully' });
+      res
+        .status(200)
+        .send({ success: true, message: "Journal updated successfully" });
     } else {
-      res.status(200).send({ success: false, message: 'Journal does not exist' });
+      res
+        .status(200)
+        .send({ success: false, message: "Journal does not exist" });
     }
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -149,9 +160,13 @@ const deleteJournal = async (req, res) => {
     // Implementation for deleting a journal
     const result = await Journal.deleteJournal(journalId);
     if (result) {
-      res.status(200).send({success: true, message: "journal deleted successfully" });
+      res
+        .status(200)
+        .send({ success: true, message: "journal deleted successfully" });
     } else {
-      res.status(200).send({success: false, message: "journal does not exist" });
+      res
+        .status(200)
+        .send({ success: false, message: "journal does not exist" });
     }
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -218,14 +233,15 @@ const getTeacherFeed = async (req, res) => {
   }
 };
 
-
 const getStudentFeed = async (req, res) => {
   const studentId = req.user.id;
 
   try {
     // Check if the user is a student
-    if (req.user.role !== 'student') {
-      return res.status(403).json({ message: 'Forbidden. Only students can access student feed.' });
+    if (req.user.role !== "student") {
+      return res
+        .status(403)
+        .json({ message: "Forbidden. Only students can access student feed." });
     }
 
     // Implementation for getting student's journal feed
@@ -260,17 +276,16 @@ const getStudentFeed = async (req, res) => {
         data: journalFeed,
       });
     } else {
-      res.status(200).json({ success: false, message: 'No feed' });
+      res.status(200).json({ success: false, message: "No feed" });
     }
   } catch (err) {
     console.log(err.message);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
-
 // students-list
-const getStudentsList = async (req,res) => {
+const getStudentsList = async (req, res) => {
   try {
     // Check if the user is a teacher
     if (req.user.role !== "teacher") {
@@ -284,14 +299,18 @@ const getStudentsList = async (req,res) => {
     if (rows) {
       res
         .status(200)
-        .send({ success: true, message: "This is the list of students", data: rows });
+        .send({
+          success: true,
+          message: "This is the list of students",
+          data: rows,
+        });
     } else {
       res.status(200).send({ success: false, message: "error" });
     }
   } catch (err) {
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 module.exports = {
   upload,
@@ -301,5 +320,5 @@ module.exports = {
   publishJournal,
   getTeacherFeed,
   getStudentFeed,
-  getStudentsList
+  getStudentsList,
 };
