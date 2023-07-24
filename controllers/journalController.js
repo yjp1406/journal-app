@@ -229,6 +229,30 @@ const getStudentFeed = async (req, res) => {
   }
 };
 
+// students-list
+const getStudentsList = async (req,res) => {
+  try {
+    // Check if the user is a teacher
+    if (req.user.role !== "teacher") {
+      return res
+        .status(403)
+        .json({ message: "Forbidden. Only teachers can access teacher feed." });
+    }
+
+    // Implementation for getting teacher's journal feed
+    const rows = await Journal.getStudentsList("student");
+    if (rows) {
+      res
+        .status(200)
+        .send({ success: true, message: "This is the list of students", data: rows });
+    } else {
+      res.status(200).send({ success: false, message: "error" });
+    }
+  } catch (err) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   createJournal,
   updateJournal,
@@ -236,4 +260,5 @@ module.exports = {
   publishJournal,
   getTeacherFeed,
   getStudentFeed,
+  getStudentsList
 };

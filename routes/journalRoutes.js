@@ -12,5 +12,8 @@ router.put('/update-journal/:id', journalController.updateJournal);
 router.delete('/delete-journal/:id', journalController.deleteJournal);
 router.post('/publish/:id', journalController.publishJournal);
 
+//student-list
+router.get('/students-list', journalController.getStudentsList);
+
 
 module.exports = router;

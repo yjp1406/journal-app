@@ -124,6 +124,15 @@ class Journal {
       throw new Error("Error fetching student feed: " + error.message);
     }
   }
+
+  static async getStudentsList(role) {
+    try {
+      const [result] = await db.query(queries.getStudentsList, [role]);
+      return result;
+    } catch (error) {
+      throw new Error("Error fetching student feed: " + error.message);
+    }
+  }
 }
 
 module.exports = Journal;
